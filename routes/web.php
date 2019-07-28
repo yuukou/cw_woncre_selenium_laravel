@@ -11,9 +11,6 @@
 |
 */
 
-//Route::get('/', 'TwitterController@index')->name('index');
-//Route::get('/trends', 'TwitterController@detail')->name('detail');
-
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
