@@ -1,20 +1,23 @@
 <?php
-/**
- * @package App\Http\Controllers
- * @copyright Copyright (C) Logical-Studio Co.,Ltd.
- * @since 2019-07-25
- */
 
 namespace App\Http\Controllers;
 
+use App\Http\Services\SeleniumService;
 use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Redirect;
 
 /**
  * Csv
  */
 class CsvController extends Controller
 {
+    private $seleniumService;
+
+    public function __construct(SeleniumService $seleniumService)
+    {
+        $this->seleniumService = $seleniumService;
+    }
+
     /**
      * csv登録画面
      *
@@ -33,7 +36,6 @@ class CsvController extends Controller
     public function post(Request $request)
     {
         setlocale(LC_ALL, 'ja_JP.UTF-8');
-
         $file = $request->csv_file;
         $data = file_get_contents($file);
         $data = mb_convert_encoding($data, 'UTF-8', 'sjis-win');
@@ -49,6 +51,7 @@ class CsvController extends Controller
                 continue;
             }
             $importData = [
+                'keyword' => $data[0],
                 'word1' => $data[1],
                 'word2' => $data[2],
                 'word3' => $data[3],
@@ -76,5 +79,9 @@ class CsvController extends Controller
             $csv[] = $importData;
         }
         fclose($temp);
+
+        $this->seleniumService->exec($csv);
+
+        return Redirect::route('csv::index');
     }
 }
