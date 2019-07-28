@@ -4,16 +4,22 @@ namespace App\Http\Services;
 
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
-use Facebook\WebDriver\WebDriver;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverExpectedCondition;
 
 class SeleniumService
 {
     /**
+     * seleniumの自動登録を実行
+     *
+     * @param $email
+     * @param $passWord
+     * @param $authentication
      * @param array $csvArray
+     * @throws \Facebook\WebDriver\Exception\NoSuchElementException
+     * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function exec(array $csvArray)
+    public function exec($email, $passWord, $authentication, array $csvArray)
     {
         // selenium
         $host = 'http://localhost:4444/wd/hub';
@@ -23,39 +29,42 @@ class SeleniumService
         $driver->manage()->window()->maximize();
         // 指定URLへ遷移 (Google)
         $driver->get('https://www.furimawatch.net/tool/#!/login');
-        // google認証ボタンクリック
-        $driver->findElement(WebDriverBy::xpath('/html/body/div[1]/div/button[1]'))->click();
 
-        # ウィンドウ移動のため1秒間停止
-        sleep(1);
+        if ($authentication === 'google') {
+            // google認証ボタンクリック
+            $driver->findElement(WebDriverBy::xpath('/html/body/div[1]/div/button[1]'))->click();
 
-        # ウィンドウハンドルを取得する
-        $handleArray = $driver->getWindowHandles();
+            # ウィンドウ移動のため1秒間停止
+            sleep(1);
 
-        # seleniumで操作可能なdriverを切り替える
-        $driver->switchTo()->window($handleArray[1]);
+            # ウィンドウハンドルを取得する
+            $handleArray = $driver->getWindowHandles();
 
-        # type email
-        // Todo: tanaka 認証情報もcsvアップロードと同時に入力してもらうようにする
-        $driver->findElement(WebDriverBy::name("identifier"))->sendKeys("yuukou.triplejump0219@gmail.com");
+            # seleniumで操作可能なdriverを切り替える
+            $driver->switchTo()->window($handleArray[1]);
 
-        # click next
-        $driver->findElement(WebDriverBy::id("identifierNext"))->click();
+            # type email
+            // Todo: tanaka 認証情報もcsvアップロードと同時に入力してもらうようにする
+            $driver->findElement(WebDriverBy::name("identifier"))->sendKeys($email);
 
-        # 画面遷移のため3秒間停止
-        sleep(3);
+            # click next
+            $driver->findElement(WebDriverBy::id("identifierNext"))->click();
 
-        # type password
-        // Todo: tanaka 認証情報もcsvアップロードと同時に入力してもらうようにする
-        $driver->findElement(WebDriverBy::name("password"))->sendKeys("yuukou0219");
+            # 画面遷移のため3秒間停止
+            sleep(3);
 
-        # click signin
-        $driver->findElement(WebDriverBy::id("passwordNext"))->click();
+            # type password
+            // Todo: tanaka 認証情報もcsvアップロードと同時に入力してもらうようにする
+            $driver->findElement(WebDriverBy::name("password"))->sendKeys($passWord);
 
-        sleep(5);
+            # click signin
+            $driver->findElement(WebDriverBy::id("passwordNext"))->click();
 
-        # seleniumで操作可能なdriverを切り替える
-        $driver->switchTo()->window($handleArray[0]);
+            sleep(5);
+
+            # seleniumで操作可能なdriverを切り替える
+            $driver->switchTo()->window($handleArray[0]);
+        }
 
         # アラートボタン押下
         $driver->findElement(WebDriverBy::xpath("/html/body/nav/ul/li[1]/a"))->click();
