@@ -29,12 +29,21 @@ class CsvController extends Controller
     }
 
     /**
-     *
+     * 自動登録用のデータを受信し、自動登録を行なう
      *
      * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Facebook\WebDriver\Exception\NoSuchElementException
+     * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
     public function post(Request $request)
     {
+        if ($request->input('email') && $request->input('password') &&  $request->input('authentication')) {
+            $email = $request->input('email');
+            $passWord = $request->input('password');
+            $authentication = $request->input('authentication');
+        }
+
         setlocale(LC_ALL, 'ja_JP.UTF-8');
         $file = $request->csv_file;
         $data = file_get_contents($file);
@@ -80,8 +89,7 @@ class CsvController extends Controller
         }
         fclose($temp);
 
-        $this->seleniumService->exec($csv);
-
+        $this->seleniumService->exec($email, $passWord, $authentication, $csv);
         return Redirect::route('csv::index');
     }
 }
