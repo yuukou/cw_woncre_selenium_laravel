@@ -30,40 +30,14 @@ class SeleniumService
         // 指定URLへ遷移 (Google)
         $driver->get('https://www.furimawatch.net/tool/#!/login');
 
+        // Google認証処理
         if ($authentication === 'google') {
-            // google認証ボタンクリック
-            $driver->findElement(WebDriverBy::xpath('/html/body/div[1]/div/button[1]'))->click();
+            $this->googleAuthentication($driver, $email, $passWord);
+        }
 
-            # ウィンドウ移動のため1秒間停止
-            sleep(1);
-
-            # ウィンドウハンドルを取得する
-            $handleArray = $driver->getWindowHandles();
-
-            # seleniumで操作可能なdriverを切り替える
-            $driver->switchTo()->window($handleArray[1]);
-
-            # type email
-            // Todo: tanaka 認証情報もcsvアップロードと同時に入力してもらうようにする
-            $driver->findElement(WebDriverBy::name("identifier"))->sendKeys($email);
-
-            # click next
-            $driver->findElement(WebDriverBy::id("identifierNext"))->click();
-
-            # 画面遷移のため3秒間停止
-            sleep(3);
-
-            # type password
-            // Todo: tanaka 認証情報もcsvアップロードと同時に入力してもらうようにする
-            $driver->findElement(WebDriverBy::name("password"))->sendKeys($passWord);
-
-            # click signin
-            $driver->findElement(WebDriverBy::id("passwordNext"))->click();
-
-            sleep(5);
-
-            # seleniumで操作可能なdriverを切り替える
-            $driver->switchTo()->window($handleArray[0]);
+        // Facebook認証処理
+        if ($authentication === 'facebook') {
+            $this->facebookAuthentication($driver, $email, $passWord);
         }
 
         # アラートボタン押下
@@ -142,6 +116,94 @@ class SeleniumService
             }
         }
         $driver->close();
+    }
+
+    /**
+     * Google認証処理
+     *
+     * @param RemoteWebDriver $driver
+     * @param $email
+     * @param $passWord
+     * @throws \Facebook\WebDriver\Exception\NoSuchElementException
+     * @throws \Facebook\WebDriver\Exception\TimeOutException
+     */
+    private function googleAuthentication(RemoteWebDriver $driver, $email, $passWord)
+    {
+        // google認証ボタンクリック
+        $driver->findElement(WebDriverBy::xpath('/html/body/div[1]/div/button[1]'))->click();
+
+        # ウィンドウ移動のため1秒間停止
+        sleep(1);
+
+        # ウィンドウハンドルを取得する
+        $handleArray = $driver->getWindowHandles();
+
+        # seleniumで操作可能なdriverを切り替える
+        $driver->switchTo()->window($handleArray[1]);
+
+        # type email
+        $driver->findElement(WebDriverBy::name("identifier"))->sendKeys($email);
+
+        # click next
+        $driver->findElement(WebDriverBy::id("identifierNext"))->click();
+
+        # 画面遷移のため3秒間停止
+        sleep(3);
+
+        # type password
+        $driver->findElement(WebDriverBy::name("password"))->sendKeys($passWord);
+
+        # click signin
+        $driver->findElement(WebDriverBy::id("passwordNext"))->click();
+
+        # seleniumで操作可能なdriverを切り替える
+        $driver->switchTo()->window($handleArray[0]);
+
+        // ログアウトの文字が表示されるまで待つ
+        $driver->wait()->until(
+            WebDriverExpectedCondition::elementTextContains(WebDriverBy::xpath("/html/body/nav/ul/li[3]/a"), 'ログアウト')
+        );
+    }
+
+    /**
+     * Facebook認証処理
+     *
+     * @param RemoteWebDriver $driver
+     * @param $email
+     * @param $passWord
+     * @throws \Facebook\WebDriver\Exception\NoSuchElementException
+     * @throws \Facebook\WebDriver\Exception\TimeOutException
+     */
+    private function facebookAuthentication(RemoteWebDriver $driver, $email, $passWord)
+    {
+        // Facebook認証ボタンクリック
+        $driver->findElement(WebDriverBy::xpath('/html/body/div[1]/div/button[2]'))->click();
+
+        # ウィンドウ移動のため1秒間停止
+        sleep(1);
+
+        # ウィンドウハンドルを取得する
+        $handleArray = $driver->getWindowHandles();
+
+        # seleniumで操作可能なdriverを切り替える
+        $driver->switchTo()->window($handleArray[1]);
+
+        # type email
+        $driver->findElement(WebDriverBy::name("email"))->sendKeys($email);
+
+        # type password
+        $driver->findElement(WebDriverBy::name("pass"))->sendKeys($passWord);
+
+        # click next
+        $driver->findElement(WebDriverBy::xpath('//*[@id="loginbutton"]'))->click();
+
+        # seleniumで操作可能なdriverを切り替える
+        $driver->switchTo()->window($handleArray[0]);
+
+        // ログアウトの文字が表示されるまで待つ
+        $driver->wait()->until(
+            WebDriverExpectedCondition::elementTextContains(WebDriverBy::xpath("/html/body/nav/ul/li[3]/a"), 'ログアウト')
+        );
     }
 
     /**
