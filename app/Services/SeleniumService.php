@@ -106,16 +106,16 @@ class SeleniumService
             # これでOKを押下
             $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/div[2]/button"))->click();
 
+            # 画面遷移のため5秒間停止（登録処理が走るので少し長めに設定）
+            $driver->wait()->until(
+                WebDriverExpectedCondition::elementToBeClickable(WebDriverBy::xpath("/html/body/div[1]/div/button"))
+            );
+
+            // 最後はwindowを閉じる
             if ($i === $length-1) {
-                break;
-            } else {
-                # 画面遷移のため5秒間停止（登録処理が走るので少し長めに設定）
-                $driver->wait()->until(
-                    WebDriverExpectedCondition::elementToBeClickable(WebDriverBy::xpath("/html/body/div[1]/div/button"))
-                );
+                $driver->close();
             }
         }
-        $driver->close();
     }
 
     /**
