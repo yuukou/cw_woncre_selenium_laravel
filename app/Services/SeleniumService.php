@@ -106,16 +106,16 @@ class SeleniumService
             # これでOKを押下
             $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/div[2]/button"))->click();
 
+            # 画面遷移のため5秒間停止（登録処理が走るので少し長めに設定）
+            $driver->wait()->until(
+                WebDriverExpectedCondition::elementToBeClickable(WebDriverBy::xpath("/html/body/div[1]/div/button"))
+            );
+
+            // 最後はwindowを閉じる
             if ($i === $length-1) {
-                break;
-            } else {
-                # 画面遷移のため5秒間停止（登録処理が走るので少し長めに設定）
-                $driver->wait()->until(
-                    WebDriverExpectedCondition::elementToBeClickable(WebDriverBy::xpath("/html/body/div[1]/div/button"))
-                );
+                $driver->close();
             }
         }
-        $driver->close();
     }
 
     /**
@@ -156,10 +156,15 @@ class SeleniumService
         # click signin
         $driver->findElement(WebDriverBy::id("passwordNext"))->click();
 
+        // googleの認証処理が全て終わるまで待つ
+        $driver->wait()->until(
+            WebDriverExpectedCondition::numberOfWindowsToBe(1)
+        );
+
         # seleniumで操作可能なdriverを切り替える
         $driver->switchTo()->window($handleArray[0]);
 
-        // ログアウトの文字が表示されるまで待つ
+        // 認証処理が通り、ログイン状態になるまで待つ
         $driver->wait()->until(
             WebDriverExpectedCondition::elementTextContains(WebDriverBy::xpath("/html/body/nav/ul/li[3]/a"), 'ログアウト')
         );
