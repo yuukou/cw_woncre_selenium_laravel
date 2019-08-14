@@ -13,6 +13,7 @@
 
 Auth::routes();
 
+Route::get('/', 'HomeController@index');
 Route::get('/home', 'HomeController@index')->name('home');
 Route::group(['as' => 'csv::', 'prefix' => 'csv'], function () {
     Route::get('', 'CsvController@index')->name('index');

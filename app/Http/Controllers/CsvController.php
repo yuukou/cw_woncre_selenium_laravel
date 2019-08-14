@@ -46,19 +46,68 @@ class CsvController extends Controller
 
         setlocale(LC_ALL, 'ja_JP.UTF-8');
         $file = $request->csv_file;
-        $data = file_get_contents($file);
-        $data = mb_convert_encoding($data, 'UTF-8', 'sjis-win');
-        $temp = tmpfile();
-        $csv  = [];
 
+        // ファイルの読み込み
+        $data = file_get_contents($file);
+        // 文字コードの変換（UTF-8 → SJIS-win）
+        $data = mb_convert_encoding($data, 'UTF-8', 'SJIS-win');
+        // 一時ファイルの作成
+        $temp = tmpfile();
+        // 一時ファイル書き込み
         fwrite($temp, $data);
+        // ファイルポインタの位置を先頭に
         rewind($temp);
+
+//        foreach ($objFile as $aryData) {
+//            if ($aryData === null) {
+//                continue;
+//            }
+//            $aryDataArray = explode(',', $aryData[0]);
+//            //headerのスキップ処理
+//            if ($aryDataArray[0] === 'キーワード') {
+//                continue;
+//            }
+//            $importData = [
+//                'keyword' => $aryDataArray[0],
+//                'word1' => $aryDataArray[1],
+//                'word2' => $aryDataArray[2],
+//                'word3' => $aryDataArray[3],
+//                'word4' => $aryDataArray[4],
+//                'word5' => $aryDataArray[5],
+//                'word6' => $aryDataArray[6],
+//                'word7' => $aryDataArray[7],
+//                'word8' => $aryDataArray[8],
+//                'word9' => $aryDataArray[9],
+//                'word10' => $aryDataArray[10],
+//                'merukari' => $aryDataArray[11],
+//                'furiru' => $aryDataArray[12],
+//                'rakuma' => $aryDataArray[13],
+//                'otama' => $aryDataArray[14],
+//                'zozo' => $aryDataArray[15],
+//                'ticket' => $aryDataArray[16],
+//                'shopiz' => $aryDataArray[17],
+//                'yahoo' => $aryDataArray[18],
+//                'bukuma' => $aryDataArray[19],
+//                'monokyun' => $aryDataArray[20],
+//                'lower' => $aryDataArray[21],
+//                'max' => $aryDataArray[22],
+//                'alert' => $aryDataArray[23]
+//            ];
+//
+//            $csv[] = $importData;
+//        }
+//
+//        fclose($temp);
+//        $objFile = null;
+
+        $csv = [];
 
         while (($data = fgetcsv($temp, 0, ",")) !== FALSE) {
             //headerのスキップ処理
             if ($data[0] === 'キーワード') {
                 continue;
             }
+
             $importData = [
                 'keyword' => $data[0],
                 'word1' => $data[1],
@@ -87,6 +136,7 @@ class CsvController extends Controller
             ];
             $csv[] = $importData;
         }
+
         fclose($temp);
 
         $this->seleniumService->exec($email, $passWord, $authentication, $csv);
