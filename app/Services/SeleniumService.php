@@ -21,6 +21,9 @@ class SeleniumService
      */
     public function exec($email, $passWord, $authentication, array $csvArray)
     {
+        // 実行時間を無制限に変更
+        set_time_limit(0);
+
         // selenium
         $host = 'http://localhost:4444/wd/hub';
         // chrome ドライバーの起動
