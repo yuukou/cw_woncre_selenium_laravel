@@ -61,8 +61,8 @@ class SeleniumService
             }
 
             # キーワード
-            if (strlen($csv['keyword'])) {
-                $driver->findElement(WebDriverBy::id("inputKwAll"))->sendKeys($csv['keyword']);
+            if (strlen($csv[0])) {
+                $driver->findElement(WebDriverBy::id("inputKwAll"))->sendKeys($csv[0]);
             }
 
             // 除外ワード登録用のワードの配列を作成
@@ -77,24 +77,24 @@ class SeleniumService
             $this->targetServiceList($driver, $csv);
 
             # 下限値段
-            if (is_numeric($csv['lower'])) {
-                if (is_int($csv['lower'])) {
-                    $driver->findElement(WebDriverBy::id("inputPmin"))->sendKeys($csv['lower']);
+            if (is_numeric($csv[21])) {
+                if (is_int($csv[21])) {
+                    $driver->findElement(WebDriverBy::id("inputPmin"))->sendKeys($csv[21]);
                 }
             }
 
             # 上限値段
-            if (is_numeric($csv['max'])) {
-                if (is_int($csv['max'])) {
-                    $driver->findElement(WebDriverBy::id("inputPmax"))->sendKeys($csv['max']);
+            if (is_numeric($csv[22])) {
+                if (is_int($csv[22])) {
+                    $driver->findElement(WebDriverBy::id("inputPmax"))->sendKeys($csv[22]);
                 }
 
             }
 
             # アラート名
-            if (strlen($csv['alert'])) {
+            if (strlen($csv[23])) {
                 $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/form/div[15]/div/label/input"))->click();
-                $driver->findElement(WebDriverBy::id("inputName"))->sendKeys($csv['alert']);
+                $driver->findElement(WebDriverBy::id("inputName"))->sendKeys($csv[23]);
             }
 
             # アラートのプレビュー押下
@@ -221,9 +221,9 @@ class SeleniumService
     {
         $wordArray = [];
         for ($i=1; $i<=10; $i++) {
-            if (strlen($csv['word'.$i])) {
+            if (strlen($csv[$i])) {
                 # 除外キーワード１
-                $wordArray[] = $csv['word'.$i];
+                $wordArray[] = $csv[$i];
             }
         }
 
@@ -239,52 +239,52 @@ class SeleniumService
     private function targetServiceList(RemoteWebDriver $driver, array $csv)
     {
         // メルカリ (o/O以外)
-        if (!($csv['merukari'] === 'o' || $csv['merukari'] === 'O')) {
+        if (!($csv[11] === 'o' || $csv[11] === 'O')) {
             $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/form/div[12]/div[1]/label"))->click();
         }
 
         // フリル (o/O以外)
-        if (!($csv['furiru'] === 'o' || $csv['furiru'] === 'O')) {
+        if (!($csv[12] === 'o' || $csv[12] === 'O')) {
             $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/form/div[12]/div[2]/label"))->click();
         }
 
         // ラクマ (o/O以外)
-        if (!($csv['rakuma'] === 'o' || $csv['rakuma'] === 'O')) {
+        if (!($csv[13] === 'o' || $csv[13] === 'O')) {
             $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/form/div[12]/div[3]/label"))->click();
         }
 
         // オタマート (o/O以外)
-        if (!($csv['otama'] === 'o' || $csv['otama'] === 'O')) {
+        if (!($csv[14] === 'o' || $csv[14] === 'O')) {
             $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/form/div[12]/div[4]/label"))->click();
         }
 
         // ZOZO (o/O以外)
-        if (!($csv['zozo'] === 'o' || $csv['zozo'] === 'O')) {
+        if (!($csv[15] === 'o' || $csv[15] === 'O')) {
             $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/form/div[12]/div[5]/label"))->click();
         }
 
         // チケットキャンプ (o/O以外)
-        if (!($csv['ticket'] === 'o' || $csv['ticket'] === 'O')) {
+        if (!($csv[16] === 'o' || $csv[16] === 'O')) {
             $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/form/div[12]/div[6]/label"))->click();
         }
 
         // ショッピーズ (o/O以外)
-        if (!($csv['shopiz'] === 'o' || $csv['shopiz'] === 'O')) {
+        if (!($csv[17] === 'o' || $csv[17] === 'O')) {
             $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/form/div[12]/div[7]/label"))->click();
         }
 
         // ヤフオク (o/O以外)
-        if (!($csv['yahoo'] === 'o' || $csv['yahoo'] === 'O')) {
+        if (!($csv[18] === 'o' || $csv[18] === 'O')) {
             $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/form/div[12]/div[8]/label"))->click();
         }
 
         // ブクマ (o/O以外)
-        if (!($csv['bukuma'] === 'o' || $csv['bukuma'] === 'O')) {
+        if (!($csv[19] === 'o' || $csv[19] === 'O')) {
             $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/form/div[12]/div[9]/label"))->click();
         }
 
         // モノキュン (o/O以外)
-        if (!($csv['monokyun'] === 'o' || $csv['monokyun'] === 'O')) {
+        if (!($csv[20] === 'o' || $csv[20] === 'O')) {
             $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/form/div[12]/div[10]/label"))->click();
         }
     }
