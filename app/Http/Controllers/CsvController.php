@@ -159,15 +159,17 @@ class CsvController extends Controller
         $fp = fopen("php://temp", "r+");
         fwrite($fp, str_replace(array("\r\n", "\r" ), "\n", $str));
         rewind($fp);
+
         while($row = fgetcsv($fp)) {
             //headerのスキップ処理
             if ($row[0] === 'キーワード') {
                 continue;
+            } else {
+                // windows の場合はSJIS-win → UTF-8 変換
+                $result[] = $is_win
+                    ? array_map(function($val){return mb_convert_encoding($val, "UTF-8", "SJIS-win");}, $row)
+                    : $row;
             }
-            // windows の場合はSJIS-win → UTF-8 変換
-            $result[] = $is_win
-                ? array_map(function($val){return mb_convert_encoding($val, "UTF-8", "SJIS-win");}, $row)
-                : $row;
         }
         fclose($fp);
         return $result;

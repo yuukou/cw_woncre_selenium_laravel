@@ -80,18 +80,17 @@ class SeleniumService
             $this->targetServiceList($driver, $csv);
 
             # 下限値段
-            if (is_numeric($csv[21])) {
-                if (is_int($csv[21])) {
+            if ($this->isDecimal($csv[21])) {
+                if ($this->isInt($csv[21])) {
                     $driver->findElement(WebDriverBy::id("inputPmin"))->sendKeys($csv[21]);
                 }
             }
 
             # 上限値段
-            if (is_numeric($csv[22])) {
-                if (is_int($csv[22])) {
+            if ($this->isDecimal($csv[22])) {
+                if ($this->isInt($csv[22])) {
                     $driver->findElement(WebDriverBy::id("inputPmax"))->sendKeys($csv[22]);
                 }
-
             }
 
             # アラート名
@@ -118,6 +117,31 @@ class SeleniumService
             if ($i === $length-1) {
                 $driver->close();
             }
+        }
+    }
+
+    /**
+     * Excel等で省略で数値の省略値で入ってきた際に入力させない
+     *
+     * @param string $value
+     * @return bool
+     */
+    private function isDecimal(string $value) {
+        return filter_var($value, FILTER_VALIDATE_INT) !== false;
+    }
+
+    /**
+     * 整数値かどうかの判定
+     *
+     * @param string $num
+     * @return bool
+     */
+    private function isInt(string $num)
+    {
+        if(preg_match("/^[0-9]+$/",$num)){
+            return true;
+        }else{
+            return false;
         }
     }
 
@@ -158,6 +182,9 @@ class SeleniumService
 
         # click signin
         $driver->findElement(WebDriverBy::id("passwordNext"))->click();
+
+        # 画面遷移のため5秒間停止
+        sleep(5);
 
         // googleの認証処理が全て終わるまで待つ
         $driver->wait()->until(
