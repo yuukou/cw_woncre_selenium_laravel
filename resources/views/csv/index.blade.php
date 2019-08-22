@@ -61,8 +61,8 @@
         </span>
             </div>
         </div>
-        <h2>Button</h2>
-        <div class="buttons">
+{{--        <h2>Button</h2>--}}
+        <div class="buttons" style="margin-top: 70px">
             <div><button type="submit" tabindex="13">送信する</button></div>
         </div>
     </div>
