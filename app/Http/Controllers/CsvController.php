@@ -160,9 +160,11 @@ class CsvController extends Controller
         fwrite($fp, str_replace(array("\r\n", "\r" ), "\n", $str));
         rewind($fp);
 
+        $index = 0;
         while($row = fgetcsv($fp)) {
             //headerのスキップ処理
-            if ($row[0] === 'キーワード') {
+            if ($index == 0) {
+                $index = 1;
                 continue;
             } else {
                 // windows の場合はSJIS-win → UTF-8 変換
