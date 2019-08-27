@@ -20,7 +20,7 @@
         </div>
     </div>
     <div>
-        <a href="{{ route('csv::index') }}">csvを登録する</a>
+        <a href="{{ route('csv::index') }}">csvの登録・削除</a>
     </div>
 </div>
 @endsection

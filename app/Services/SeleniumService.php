@@ -10,12 +10,52 @@ use Facebook\WebDriver\WebDriverExpectedCondition;
 class SeleniumService
 {
     /**
+     * csvファイルをプログラムで読み込める形に成形し直す
+     *
+     * @param $file
+     * @return array
+     */
+    public function parseCsv($file)
+    {
+        $str = file_get_contents($file);
+        $is_win = strpos(PHP_OS, "WIN") === 0;
+        // Windowsの場合は Shift_JIS、Unix系は UTF-8で処理
+        if ( $is_win ) {
+            setlocale(LC_ALL, "Japanese_Japan.932");
+        } else {
+            setlocale(LC_ALL, "ja_JP.UTF-8");
+            $str = mb_convert_encoding($str, "UTF-8", "SJIS-win");
+        }
+        $result = array();
+        $fp = fopen("php://temp", "r+");
+        fwrite($fp, str_replace(array("\r\n", "\r" ), "\n", $str));
+        rewind($fp);
+
+        $index = 0;
+        while($row = fgetcsv($fp)) {
+            //headerのスキップ処理
+            if ($index == 0) {
+                $index = 1;
+                continue;
+            } else {
+                // windows の場合はSJIS-win → UTF-8 変換
+                $result[] = $is_win
+                    ? array_map(function($val){return mb_convert_encoding($val, "UTF-8", "SJIS-win");}, $row)
+                    : $row;
+            }
+        }
+        fclose($fp);
+        return $result;
+    }
+
+    /**
      * seleniumの自動登録を実行
      *
      * @param $email
      * @param $passWord
      * @param $authentication
      * @param array $csvArray
+     * @return void
      * @throws \Facebook\WebDriver\Exception\NoSuchElementException
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
@@ -316,6 +356,65 @@ class SeleniumService
         // モノキュン (o/O以外)
         if (!($csv[20] === 'o' || $csv[20] === 'O')) {
             $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/form/div[12]/div[10]/label"))->click();
+        }
+    }
+
+    /**
+     * 登録されているアラートの一括削除
+     *
+     * @param $email
+     * @param $passWord
+     * @param $authentication
+     * @return void
+     * @throws \Facebook\WebDriver\Exception\NoSuchElementException
+     * @throws \Facebook\WebDriver\Exception\TimeOutException
+     */
+    public function execDelete($email, $passWord, $authentication)
+    {
+        // 実行時間を無制限に変更
+        set_time_limit(0);
+
+        // selenium
+        $host = 'http://localhost:4444/wd/hub';
+        // chrome ドライバーの起動
+        $driver = RemoteWebDriver::create($host, DesiredCapabilities::chrome());
+        // 画面サイズをMAXに
+        $driver->manage()->window()->maximize();
+        // 指定URLへ遷移 (Google)
+        $driver->get('https://www.furimawatch.net/tool/#!/login');
+
+        // Google認証処理
+        if ($authentication === 'google') {
+            $this->googleAuthentication($driver, $email, $passWord);
+        }
+
+        // Facebook認証処理
+        if ($authentication === 'facebook') {
+            $this->facebookAuthentication($driver, $email, $passWord);
+        }
+
+        # アラートボタン押下
+        $driver->findElement(WebDriverBy::xpath("/html/body/nav/ul/li[1]/a"))->click();
+
+        # 画面遷移と保存アラート表示待機のため3秒間停止
+        sleep(3);
+
+        try {
+            while ($driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/table/tbody/tr[1]/td[4]/button[2]"))) {
+                # 登録されている最上位アラートの削除ボタンをクリック
+                $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/table/tbody/tr[1]/td[4]/button[2]"))->click();
+
+                # 削除確認モーダル表示待機のため2秒間停止
+                sleep(2);
+
+                # 削除確認の確認モーダルの「OKボタン」をクリック
+                $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/div/form/div[2]/div/a"))->click();
+
+                # 削除が画面に反映されるのを待つために5秒待機
+                sleep(3);
+            }
+        } catch (\Exception $e) {
+            $driver->close();
         }
     }
 }

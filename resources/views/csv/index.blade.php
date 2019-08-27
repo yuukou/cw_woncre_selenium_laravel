@@ -21,7 +21,6 @@
 </head>
 
 <body>
-{{-- Todo: tanaka bootstrapを使用するのが練習にもなるし、レスポンシブにもなってよいのでは？？ --}}
 <form method="post" action="{{ route('csv::post') }}" enctype="multipart/form-data" id="csvUpload">
     {{ csrf_field() }}
     <div class="form-inner">
@@ -69,10 +68,12 @@
         </div>
 {{--        <h2>Button</h2>--}}
         <div class="buttons" style="margin-top: 70px">
-            <div><button type="submit" tabindex="13">送信する</button></div>
+            <div><button type="submit" tabindex="13">登録する</button></div>
+            <div><button type="submit" tabindex="13" onclick="submitDelete()">削除する</button></div>
         </div>
     </div>
 </form>
+@include('csv.elements.input_script')
 </body>
 </html>
 

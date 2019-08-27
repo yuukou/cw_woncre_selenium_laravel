@@ -18,4 +18,5 @@ Route::get('/home', 'HomeController@index')->name('home');
 Route::group(['as' => 'csv::', 'prefix' => 'csv'], function () {
     Route::get('', 'CsvController@index')->name('index');
     Route::post('', 'CsvController@post')->name('post');
+    Route::post('/delete', 'CsvController@delete')->name('delete');
 });
