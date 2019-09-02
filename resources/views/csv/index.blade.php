@@ -24,6 +24,7 @@
 <form method="post" action="{{ route('csv::post') }}" enctype="multipart/form-data" id="csvUpload">
     {{ csrf_field() }}
     <div class="form-inner">
+        <h1>{{ config('app.name') }}</h1>
         <h2>認証用メールアドレス, パスワード</h2>
         <div>
             <div class="underline">

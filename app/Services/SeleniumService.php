@@ -97,67 +97,78 @@ class SeleniumService
 
         // 配列の長さ
         $length = count($csvArray);
-        foreach ($csvArray as $i => $csv) {
-            if ($i !== 0) {
-                # 新しいアラートの作成を押下
-                $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/button"))->click();
-            }
+//        try {
+            foreach ($csvArray as $i => $csv) {
+                if ($i !== 0) {
+                    if (! WebDriverExpectedCondition::elementToBeClickable(WebDriverBy::xpath("/html/body/div[1]/div/button"))) {
+                        # 再度アラートボタンをクリック可能になるまで待つ
+                        $driver->wait()->until(
+                            WebDriverExpectedCondition::elementToBeClickable(WebDriverBy::xpath("/html/body/div[1]/div/button"))
+                        );
+                    }
 
-            # キーワード
-            if (strlen($csv[0])) {
-                $driver->findElement(WebDriverBy::id("inputKwAll"))->sendKeys($csv[0]);
-            }
+                    # 新しいアラートの作成を押下
+                    $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/button"))->click();
+                }
 
-            // 除外ワード登録用のワードの配列を作成
-            $wordArray = $this->createFormatWordArray($csv);
+                # キーワード
+                if (strlen($csv[0])) {
+                    $driver->findElement(WebDriverBy::id("inputKwAll"))->sendKeys($csv[0]);
+                }
 
-            // 除外ワード登録
-            foreach ($wordArray as $key => $word) {
-                $driver->findElement(WebDriverBy::id("inputKwe".($key+1)))->sendKeys($word);
-            }
+                // 除外ワード登録用のワードの配列を作成
+                $wordArray = $this->createFormatWordArray($csv);
 
-            # 対象サービス
-            $this->targetServiceList($driver, $csv);
+                // 除外ワード登録
+                foreach ($wordArray as $key => $word) {
+                    $driver->findElement(WebDriverBy::id("inputKwe".($key+1)))->sendKeys($word);
+                }
 
-            # 下限値段
-            if ($this->isDecimal($csv[21])) {
-                if ($this->isInt($csv[21])) {
-                    $driver->findElement(WebDriverBy::id("inputPmin"))->sendKeys($csv[21]);
+                # 対象サービス
+                $this->targetServiceList($driver, $csv);
+
+                # 下限値段
+                if ($this->isDecimal($csv[21])) {
+                    if ($this->isInt($csv[21])) {
+                        $driver->findElement(WebDriverBy::id("inputPmin"))->sendKeys($csv[21]);
+                    }
+                }
+
+                # 上限値段
+                if ($this->isDecimal($csv[22])) {
+                    if ($this->isInt($csv[22])) {
+                        $driver->findElement(WebDriverBy::id("inputPmax"))->sendKeys($csv[22]);
+                    }
+                }
+
+                # アラート名
+                if (strlen($csv[23])) {
+                    $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/form/div[15]/div/label/input"))->click();
+                    $driver->findElement(WebDriverBy::id("inputName"))->sendKeys($csv[23]);
+                }
+
+                # アラートのプレビュー押下
+                $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/form/button"))->click();
+
+                # 画面遷移のため1秒間停止
+                sleep(1);
+
+                # これでOKを押下
+                $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/div[2]/button"))->click();
+
+                # 再度アラートボタンをクリック可能になるまで待つ
+                $driver->wait()->until(
+                    WebDriverExpectedCondition::elementToBeClickable(WebDriverBy::xpath("/html/body/div[1]/div/button"))
+                );
+
+                // 最後はwindowを閉じる
+                if ($i === $length-1) {
+                    $driver->close();
                 }
             }
-
-            # 上限値段
-            if ($this->isDecimal($csv[22])) {
-                if ($this->isInt($csv[22])) {
-                    $driver->findElement(WebDriverBy::id("inputPmax"))->sendKeys($csv[22]);
-                }
-            }
-
-            # アラート名
-            if (strlen($csv[23])) {
-                $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/form/div[15]/div/label/input"))->click();
-                $driver->findElement(WebDriverBy::id("inputName"))->sendKeys($csv[23]);
-            }
-
-            # アラートのプレビュー押下
-            $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/form/button"))->click();
-
-            # 画面遷移のため1秒間停止
-            sleep(1);
-
-            # これでOKを押下
-            $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/div[2]/button"))->click();
-
-            # 画面遷移のため5秒間停止（登録処理が走るので少し長めに設定）
-            $driver->wait()->until(
-                WebDriverExpectedCondition::elementToBeClickable(WebDriverBy::xpath("/html/body/div[1]/div/button"))
-            );
-
-            // 最後はwindowを閉じる
-            if ($i === $length-1) {
-                $driver->close();
-            }
-        }
+//        } catch (\Exception $e) {
+//            $driver->close();
+//        }
     }
 
     /**
