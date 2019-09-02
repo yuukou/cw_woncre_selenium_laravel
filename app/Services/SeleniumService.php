@@ -156,6 +156,9 @@ class SeleniumService
                 # これでOKを押下
                 $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/div[2]/button"))->click();
 
+                # 画面遷移のため1秒間停止
+                sleep(5);
+
                 # 再度アラートボタンをクリック可能になるまで待つ
                 $driver->wait()->until(
                     WebDriverExpectedCondition::elementToBeClickable(WebDriverBy::xpath("/html/body/div[1]/div/button"))
@@ -282,6 +285,14 @@ class SeleniumService
 
         # click next
         $driver->findElement(WebDriverBy::xpath('//*[@id="loginbutton"]'))->click();
+
+        # 画面遷移のため5秒間停止
+        sleep(5);
+
+        // facebookの認証処理が全て終わるまで待つ
+        $driver->wait()->until(
+            WebDriverExpectedCondition::numberOfWindowsToBe(1)
+        );
 
         # seleniumで操作可能なdriverを切り替える
         $driver->switchTo()->window($handleArray[0]);
