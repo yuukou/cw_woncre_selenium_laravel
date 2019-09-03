@@ -100,13 +100,6 @@ class SeleniumService
 //        try {
             foreach ($csvArray as $i => $csv) {
                 if ($i !== 0) {
-                    if (! WebDriverExpectedCondition::elementToBeClickable(WebDriverBy::xpath("/html/body/div[1]/div/button"))) {
-                        # 再度アラートボタンをクリック可能になるまで待つ
-                        $driver->wait()->until(
-                            WebDriverExpectedCondition::elementToBeClickable(WebDriverBy::xpath("/html/body/div[1]/div/button"))
-                        );
-                    }
-
                     # 新しいアラートの作成を押下
                     $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/button"))->click();
                 }
@@ -156,11 +149,8 @@ class SeleniumService
                 # これでOKを押下
                 $driver->findElement(WebDriverBy::xpath("/html/body/div[1]/div/div[2]/button"))->click();
 
-                # 画面遷移のため1秒間停止
-                sleep(5);
-
                 # 再度アラートボタンをクリック可能になるまで待つ
-                $driver->wait()->until(
+                $driver->wait(100)->until(
                     WebDriverExpectedCondition::elementToBeClickable(WebDriverBy::xpath("/html/body/div[1]/div/button"))
                 );
 
