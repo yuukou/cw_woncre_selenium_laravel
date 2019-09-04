@@ -276,11 +276,9 @@ class SeleniumService
         # click next
         $driver->findElement(WebDriverBy::xpath('//*[@id="loginbutton"]'))->click();
 
-        # 画面遷移のため5秒間停止
-        sleep(5);
 
         // facebookの認証処理が全て終わるまで待つ
-        $driver->wait()->until(
+        $driver->wait(100)->until(
             WebDriverExpectedCondition::numberOfWindowsToBe(1)
         );
 
