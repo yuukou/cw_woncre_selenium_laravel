@@ -69,6 +69,7 @@
         </div>
 {{--        <h2>Button</h2>--}}
         <div class="buttons" style="margin-top: 70px">
+            <div><button type="button" tabindex="13" formtarget="_blank" onclick="window.open().location.href='https://www.furimawatch.net/tool/'">公式ページへ</button></div>
             <div><button type="submit" tabindex="13">登録する</button></div>
             <div><button type="submit" tabindex="13" onclick="submitDelete()">削除する</button></div>
         </div>
